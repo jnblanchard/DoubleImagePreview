@@ -21,35 +21,43 @@ class DoubleImagePreView: UIView {
 
     let imageViewOne = UIImageView()
     let imageViewTwo = UIImageView()
+    let parentViewOne = UIView()
+    let parentViewTwo = UIView()
     let moveableView         = UIView()
     let circularMoveableView = UIView()
+
+    var amountFirstImageIsOffScreen: CGFloat = 0
 
 
     func orientationChanged() {
         var imageOneWidth = (frame.size.width/2)-(separationSize/2)
         if UIDevice.current.orientation.isPortrait {
-            guard imageViewOne.frame.size.height != frame.size.height else { return }
-            imageOneWidth = imageViewOne.frame.size.width * 0.562
+            guard parentViewOne.frame.size.height != frame.size.height else { return }
+            imageOneWidth = parentViewOne.frame.size.width * 0.562
         } else {
-            guard imageViewOne.frame.size.height != frame.size.height else { return }
-            imageOneWidth = imageViewOne.frame.size.width * 1.778
+            guard parentViewOne.frame.size.height != frame.size.height else { return }
+            imageOneWidth = parentViewOne.frame.size.width * 1.778
         }
-        imageViewOne.frame = CGRect(x: frame.origin.x,
+
+//        imageViewOne.frame = CGRect(x: frame.origin.x, y: frame.origin.y, width: frame.size.width, height: frame.size.height)
+//        imageViewTwo.frame = CGRect(x: frame.origin.x, y: frame.origin.y, width: frame.size.width, height: frame.size.height)
+
+        parentViewOne.frame = CGRect(x: frame.origin.x,
                                     y: frame.origin.y,
                                     width: imageOneWidth,
                                     height: frame.size.height)
 
-        imageViewTwo.frame = CGRect(x: imageOneWidth+separationSize,
+        parentViewTwo.frame = CGRect(x: imageOneWidth+separationSize,
                                     y: frame.origin.y,
                                     width: frame.size.width-(imageOneWidth+separationSize),
                                     height: frame.size.height)
 
-        moveableView.frame = CGRect(x: imageViewTwo.frame.origin.x-separationSize,
+        moveableView.frame = CGRect(x: parentViewTwo.frame.origin.x-separationSize,
                                     y: frame.origin.y,
                                     width: separationSize,
                                     height: frame.size.height)
 
-        circularMoveableView.frame = CGRect(x: (imageViewTwo.frame.origin.x-(separationSize/2))-(circularSize/2),
+        circularMoveableView.frame = CGRect(x: (parentViewTwo.frame.origin.x-(separationSize/2))-(circularSize/2),
                                             y: (frame.size.height/2)-(circularSize/2),
                                             width: circularSize,
                                             height: circularSize)
@@ -58,17 +66,17 @@ class DoubleImagePreView: UIView {
     override func draw(_ rect: CGRect) {
         self.backgroundColor = UIColor.brown
 
-        imageViewOne.frame = CGRect(x: rect.origin.x,
+        parentViewOne.frame = CGRect(x: rect.origin.x,
                                     y: rect.origin.y,
                                     width: (rect.size.width/2)-(separationSize/2),
                                     height: rect.size.height)
-        imageViewOne.backgroundColor = UIColor.green
+        parentViewOne.backgroundColor = UIColor.green
 
-        imageViewTwo.frame = CGRect(x: (rect.size.width/2)+(separationSize/2),
+        parentViewTwo.frame = CGRect(x: (rect.size.width/2)+(separationSize/2),
                                     y: rect.origin.y,
                                     width: (rect.size.width/2)-(separationSize/2),
                                     height: rect.size.height)
-        imageViewTwo.backgroundColor = UIColor.blue
+        parentViewTwo.backgroundColor = UIColor.blue
 
         moveableView.frame = CGRect(x: (rect.size.width/2)-(separationSize/2),
                                     y: rect.origin.y,
@@ -83,9 +91,15 @@ class DoubleImagePreView: UIView {
         circularMoveableView.layer.cornerRadius = circularSize/2
         circularMoveableView.backgroundColor = UIColor.black
 
+//        imageViewOne.frame = CGRect(x: rect.origin.x-(rect.size.width/2), y: rect.origin.y, width: rect.size.width, height: rect.size.height)
+        imageViewOne.frame = CGRect(x: rect.origin.x, y: rect.origin.y, width: rect.size.width, height: rect.size.height)
+        imageViewTwo.frame = CGRect(x: rect.origin.x, y: rect.origin.y, width: rect.size.width, height: rect.size.height)
 
-        addSubview(imageViewOne)
+
+        addSubview(parentViewOne)
+        addSubview(parentViewTwo)
         addSubview(imageViewTwo)
+        addSubview(imageViewOne)
         addSubview(moveableView)
         addSubview(circularMoveableView)
 
@@ -114,8 +128,9 @@ class DoubleImagePreView: UIView {
     }
 
     func setPhotoSizeForCurrentMoveableViewState() {
-        imageViewOne.frame = CGRect(x: 0, y: 0, width: moveableView.frame.origin.x, height: imageViewOne.frame.size.height)
-        imageViewTwo.frame = CGRect(x: moveableView.frame.origin.x+separationSize, y: 0, width: self.frame.size.width-(moveableView.frame.origin.x+separationSize) , height: imageViewTwo.frame.size.height)
+        parentViewOne.frame = CGRect(x: 0, y: 0, width: moveableView.frame.origin.x, height: parentViewOne.frame.size.height)
+        parentViewTwo.frame = CGRect(x: moveableView.frame.origin.x+separationSize, y: 0, width: self.frame.size.width-(moveableView.frame.origin.x+separationSize) , height: parentViewTwo.frame.size.height)
+//        imageViewOne.frame.origin.x = (-imageViewOne.frame.size.width)+parentViewOne.frame.size.width
         switch firstImageViewIsProminant() {
         case .First:
             break

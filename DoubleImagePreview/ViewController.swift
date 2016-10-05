@@ -9,9 +9,11 @@
 import UIKit
 
 class ViewController: UIViewController {
+    @IBOutlet var doubleImagePreView: DoubleImagePreView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        doubleImagePreView.setBothImages(imageOne: UIImage(named: "kd")!, imageTwo: UIImage(named: "kdEffect")!)
         // Do any additional setup after loading the view, typically from a nib.
     }
 

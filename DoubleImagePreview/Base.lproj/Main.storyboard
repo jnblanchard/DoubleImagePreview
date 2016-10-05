@@ -18,7 +18,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="CK7-Yr-sls" customClass="DoubleImagePreView" customModule="DoubleImagePreview" customModuleProvider="target">
+                            <view contentMode="center" translatesAutoresizingMaskIntoConstraints="NO" id="CK7-Yr-sls" customClass="DoubleImagePreView" customModule="DoubleImagePreview" customModuleProvider="target">
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
                         </subviews>
@@ -30,6 +30,9 @@
                             <constraint firstItem="CK7-Yr-sls" firstAttribute="bottom" secondItem="wfy-db-euE" secondAttribute="top" id="nj7-Nx-oOC"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="doubleImagePreView" destination="CK7-Yr-sls" id="OHD-s8-qHA"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
