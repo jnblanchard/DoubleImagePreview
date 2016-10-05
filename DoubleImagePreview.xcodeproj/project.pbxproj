@@ -14,6 +14,7 @@
 		AC7961EC1DA4825B0083F9CD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AC7961EA1DA4825B0083F9CD /* LaunchScreen.storyboard */; };
 		AC7961F71DA4825B0083F9CD /* DoubleImagePreviewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7961F61DA4825B0083F9CD /* DoubleImagePreviewTests.swift */; };
 		AC7962021DA4825B0083F9CD /* DoubleImagePreviewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7962011DA4825B0083F9CD /* DoubleImagePreviewUITests.swift */; };
+		AC7962101DA482B00083F9CD /* DoubleImagePreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC79620F1DA482B00083F9CD /* DoubleImagePreView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +48,7 @@
 		AC7961FD1DA4825B0083F9CD /* DoubleImagePreviewUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DoubleImagePreviewUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC7962011DA4825B0083F9CD /* DoubleImagePreviewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoubleImagePreviewUITests.swift; sourceTree = "<group>"; };
 		AC7962031DA4825B0083F9CD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AC79620F1DA482B00083F9CD /* DoubleImagePreView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DoubleImagePreView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +101,7 @@
 			children = (
 				AC7961E11DA4825B0083F9CD /* AppDelegate.swift */,
 				AC7961E31DA4825B0083F9CD /* ViewController.swift */,
+				AC79620F1DA482B00083F9CD /* DoubleImagePreView.swift */,
 				AC7961E51DA4825B0083F9CD /* Main.storyboard */,
 				AC7961E81DA4825B0083F9CD /* Assets.xcassets */,
 				AC7961EA1DA4825B0083F9CD /* LaunchScreen.storyboard */,
@@ -264,6 +267,7 @@
 			files = (
 				AC7961E41DA4825B0083F9CD /* ViewController.swift in Sources */,
 				AC7961E21DA4825B0083F9CD /* AppDelegate.swift in Sources */,
+				AC7962101DA482B00083F9CD /* DoubleImagePreView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
