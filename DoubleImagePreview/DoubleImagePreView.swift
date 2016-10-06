@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import QuartzCore
 
 enum DoubleImageState {
     case First
@@ -19,12 +20,14 @@ class DoubleImagePreView: UIView {
     let separationSize: CGFloat = 1.0
     let circularSize  : CGFloat = 60.0
 
-    let imageViewOne = UIImageView()
+    var imageViewOne = UIImageView()
     let imageViewTwo = UIImageView()
     let parentViewOne = UIView()
-    let parentViewTwo = UIView()
+    var parentViewTwo = UIView()
     let moveableView         = UIView()
     let circularMoveableView = UIView()
+    var maskLayer = CALayer()
+
 
     var amountFirstImageIsOffScreen: CGFloat = 0
 
@@ -39,8 +42,7 @@ class DoubleImagePreView: UIView {
             imageOneWidth = parentViewOne.frame.size.width * 1.778
         }
 
-//        imageViewOne.frame = CGRect(x: frame.origin.x, y: frame.origin.y, width: frame.size.width, height: frame.size.height)
-//        imageViewTwo.frame = CGRect(x: frame.origin.x, y: frame.origin.y, width: frame.size.width, height: frame.size.height)
+
 
         parentViewOne.frame = CGRect(x: frame.origin.x,
                                     y: frame.origin.y,
@@ -52,6 +54,9 @@ class DoubleImagePreView: UIView {
                                     width: frame.size.width-(imageOneWidth+separationSize),
                                     height: frame.size.height)
 
+        imageViewOne.frame = CGRect(x: frame.origin.x, y: frame.origin.y, width: frame.size.width, height: frame.size.height)
+        imageViewTwo.frame = CGRect(x: frame.origin.x, y: frame.origin.y, width: frame.size.width, height: frame.size.height)
+
         moveableView.frame = CGRect(x: parentViewTwo.frame.origin.x-separationSize,
                                     y: frame.origin.y,
                                     width: separationSize,
@@ -61,7 +66,10 @@ class DoubleImagePreView: UIView {
                                             y: (frame.size.height/2)-(circularSize/2),
                                             width: circularSize,
                                             height: circularSize)
+        maskLayer.frame = parentViewOne.frame
+
     }
+
 
     override func draw(_ rect: CGRect) {
         self.backgroundColor = UIColor.brown
@@ -91,10 +99,8 @@ class DoubleImagePreView: UIView {
         circularMoveableView.layer.cornerRadius = circularSize/2
         circularMoveableView.backgroundColor = UIColor.black
 
-//        imageViewOne.frame = CGRect(x: rect.origin.x-(rect.size.width/2), y: rect.origin.y, width: rect.size.width, height: rect.size.height)
         imageViewOne.frame = CGRect(x: rect.origin.x, y: rect.origin.y, width: rect.size.width, height: rect.size.height)
         imageViewTwo.frame = CGRect(x: rect.origin.x, y: rect.origin.y, width: rect.size.width, height: rect.size.height)
-
 
         addSubview(parentViewOne)
         addSubview(parentViewTwo)
@@ -102,6 +108,11 @@ class DoubleImagePreView: UIView {
         addSubview(imageViewOne)
         addSubview(moveableView)
         addSubview(circularMoveableView)
+
+        maskLayer.frame = parentViewOne.frame
+        maskLayer.backgroundColor = UIColor.gray.cgColor
+        imageViewOne.layer.mask = maskLayer
+//        imageViewOne.layer.masksToBounds = true
 
         NotificationCenter.default.addObserver(self,
                                                          selector: #selector(orientationChanged),
@@ -113,8 +124,10 @@ class DoubleImagePreView: UIView {
     }
 
     func setBothImages(imageOne: UIImage, imageTwo: UIImage) {
-        imageViewOne.image = imageOne
         imageViewTwo.image = imageTwo
+        maskLayer.contents = imageViewTwo.image
+        imageViewOne.image = imageOne
+
     }
 
     func firstImageViewIsProminant() -> DoubleImageState {
@@ -130,7 +143,6 @@ class DoubleImagePreView: UIView {
     func setPhotoSizeForCurrentMoveableViewState() {
         parentViewOne.frame = CGRect(x: 0, y: 0, width: moveableView.frame.origin.x, height: parentViewOne.frame.size.height)
         parentViewTwo.frame = CGRect(x: moveableView.frame.origin.x+separationSize, y: 0, width: self.frame.size.width-(moveableView.frame.origin.x+separationSize) , height: parentViewTwo.frame.size.height)
-//        imageViewOne.frame.origin.x = (-imageViewOne.frame.size.width)+parentViewOne.frame.size.width
         switch firstImageViewIsProminant() {
         case .First:
             break
@@ -148,17 +160,20 @@ class DoubleImagePreView: UIView {
         case .ended:
             break
         default:
-            moveableView.frame.origin.x         += pgr.translation(in: self).x
-            circularMoveableView.frame.origin.x += pgr.translation(in: self).x
-            if moveableView.frame.origin.x <= self.frame.origin.x {
-                moveableView.frame.origin.x = self.frame.origin.x
-                circularMoveableView.frame.origin.x = self.frame.origin.x - (circularSize/2)
-            } else if moveableView.frame.origin.x + moveableView.frame.size.width >= self.frame.size.width {
-                moveableView.frame.origin.x = self.frame.size.width - moveableView.frame.size.width
-                circularMoveableView.frame.origin.x = self.frame.size.width - moveableView.frame.size.width - (circularSize/2)
+            DispatchQueue.main.async {
+                self.moveableView.frame.origin.x         += pgr.translation(in: self).x
+                self.circularMoveableView.frame.origin.x += pgr.translation(in: self).x
+                if self.moveableView.frame.origin.x <= self.frame.origin.x {
+                    self.moveableView.frame.origin.x = self.frame.origin.x
+                    self.circularMoveableView.frame.origin.x = self.frame.origin.x - (self.circularSize/2)
+                } else if self.moveableView.frame.origin.x + self.moveableView.frame.size.width >= self.frame.size.width {
+                    self.moveableView.frame.origin.x = self.frame.size.width - self.moveableView.frame.size.width
+                    self.circularMoveableView.frame.origin.x = self.frame.size.width - self.moveableView.frame.size.width - (self.circularSize/2)
+                }
+                self.maskLayer.frame = CGRect(x: 0, y: 0, width: self.moveableView.frame.origin.x, height: self.frame.size.height)
+                self.setPhotoSizeForCurrentMoveableViewState()
+                pgr.setTranslation(CGPoint.zero, in: self)
             }
-            pgr.setTranslation(CGPoint.zero, in: self)
-            setPhotoSizeForCurrentMoveableViewState()
         }
     }
 
