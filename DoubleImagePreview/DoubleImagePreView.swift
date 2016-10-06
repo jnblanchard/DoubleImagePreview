@@ -122,6 +122,7 @@ class DoubleImagePreView: UIView {
                                                          name: NSNotification.Name.UIDeviceOrientationDidChange,
                                                          object: nil)
 
+
         let pgr = UIPanGestureRecognizer(target: self, action: #selector(handlePan))
         circularMoveableView.addGestureRecognizer(pgr)
     }
@@ -146,6 +147,10 @@ class DoubleImagePreView: UIView {
     func setPhotoSizeForCurrentMoveableViewState() {
         parentViewOne.frame = CGRect(x: 0, y: 0, width: moveableView.frame.origin.x, height: parentViewOne.frame.size.height)
         parentViewTwo.frame = CGRect(x: moveableView.frame.origin.x+separationSize, y: 0, width: self.frame.size.width-(moveableView.frame.origin.x+separationSize) , height: parentViewTwo.frame.size.height)
+        CATransaction.begin()
+        CATransaction.setValue(kCFBooleanTrue, forKey: kCATransactionDisableActions)
+        maskLayer.frame = CGRect(x: 0, y: 0, width: moveableView.frame.origin.x, height: frame.size.height)
+        CATransaction.commit()
         switch firstImageViewIsProminant() {
         case .First:
             break
@@ -159,25 +164,23 @@ class DoubleImagePreView: UIView {
     func handlePan(pgr: UIPanGestureRecognizer) {
         switch pgr.state {
         case .cancelled:
-            circularMoveableView.backgroundColor = UIColor.black
+            break
         case .ended:
-            circularMoveableView.backgroundColor = UIColor.black
+            break
+        case .began:
+            break
         default:
-            DispatchQueue.main.async {
-                self.circularMoveableView.backgroundColor = UIColor.white
-                self.moveableView.frame.origin.x         += pgr.translation(in: self).x
-                self.circularMoveableView.frame.origin.x += pgr.translation(in: self).x
-                if self.moveableView.frame.origin.x <= self.frame.origin.x {
-                    self.moveableView.frame.origin.x = self.frame.origin.x
-                    self.circularMoveableView.frame.origin.x = self.frame.origin.x - (self.circularSize/2)
-                } else if self.moveableView.frame.origin.x + self.moveableView.frame.size.width >= self.frame.size.width {
-                    self.moveableView.frame.origin.x = self.frame.size.width - self.moveableView.frame.size.width
-                    self.circularMoveableView.frame.origin.x = self.frame.size.width - self.moveableView.frame.size.width - (self.circularSize/2)
-                }
-                self.maskLayer.frame = CGRect(x: 0, y: 0, width: self.moveableView.frame.origin.x, height: self.frame.size.height)
-                self.setPhotoSizeForCurrentMoveableViewState()
-                pgr.setTranslation(CGPoint.zero, in: self)
+            moveableView.frame.origin.x         += pgr.translation(in: self).x
+            circularMoveableView.frame.origin.x += pgr.translation(in: self).x
+            if moveableView.frame.origin.x <= frame.origin.x {
+                moveableView.frame.origin.x = frame.origin.x
+                circularMoveableView.frame.origin.x = frame.origin.x - (circularSize/2)
+            } else if moveableView.frame.origin.x + moveableView.frame.size.width >= frame.size.width {
+                moveableView.frame.origin.x = frame.size.width - moveableView.frame.size.width
+                circularMoveableView.frame.origin.x = frame.size.width - moveableView.frame.size.width - (circularSize/2)
             }
+            setPhotoSizeForCurrentMoveableViewState()
+            pgr.setTranslation(CGPoint.zero, in: self)
         }
     }
 
