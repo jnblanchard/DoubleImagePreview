@@ -57,6 +57,7 @@ class DoubleImagePreView: UIView {
         imageViewOne.frame = CGRect(x: frame.origin.x, y: frame.origin.y, width: frame.size.width, height: frame.size.height)
         imageViewTwo.frame = CGRect(x: frame.origin.x, y: frame.origin.y, width: frame.size.width, height: frame.size.height)
 
+
         moveableView.frame = CGRect(x: parentViewTwo.frame.origin.x-separationSize,
                                     y: frame.origin.y,
                                     width: separationSize,
@@ -66,6 +67,8 @@ class DoubleImagePreView: UIView {
                                             y: (frame.size.height/2)-(circularSize/2),
                                             width: circularSize,
                                             height: circularSize)
+        circularMoveableView.backgroundColor = UIColor.black
+
         maskLayer.frame = parentViewOne.frame
 
     }
@@ -78,13 +81,11 @@ class DoubleImagePreView: UIView {
                                     y: rect.origin.y,
                                     width: (rect.size.width/2)-(separationSize/2),
                                     height: rect.size.height)
-        parentViewOne.backgroundColor = UIColor.green
 
         parentViewTwo.frame = CGRect(x: (rect.size.width/2)+(separationSize/2),
                                     y: rect.origin.y,
                                     width: (rect.size.width/2)-(separationSize/2),
                                     height: rect.size.height)
-        parentViewTwo.backgroundColor = UIColor.blue
 
         moveableView.frame = CGRect(x: (rect.size.width/2)-(separationSize/2),
                                     y: rect.origin.y,
@@ -100,7 +101,10 @@ class DoubleImagePreView: UIView {
         circularMoveableView.backgroundColor = UIColor.black
 
         imageViewOne.frame = CGRect(x: rect.origin.x, y: rect.origin.y, width: rect.size.width, height: rect.size.height)
+        imageViewOne.contentMode = .scaleAspectFill
+
         imageViewTwo.frame = CGRect(x: rect.origin.x, y: rect.origin.y, width: rect.size.width, height: rect.size.height)
+        imageViewTwo.contentMode = .scaleAspectFill
 
         addSubview(parentViewOne)
         addSubview(parentViewTwo)
@@ -112,7 +116,6 @@ class DoubleImagePreView: UIView {
         maskLayer.frame = parentViewOne.frame
         maskLayer.backgroundColor = UIColor.gray.cgColor
         imageViewOne.layer.mask = maskLayer
-//        imageViewOne.layer.masksToBounds = true
 
         NotificationCenter.default.addObserver(self,
                                                          selector: #selector(orientationChanged),
@@ -156,11 +159,12 @@ class DoubleImagePreView: UIView {
     func handlePan(pgr: UIPanGestureRecognizer) {
         switch pgr.state {
         case .cancelled:
-            break
+            circularMoveableView.backgroundColor = UIColor.black
         case .ended:
-            break
+            circularMoveableView.backgroundColor = UIColor.black
         default:
             DispatchQueue.main.async {
+                self.circularMoveableView.backgroundColor = UIColor.white
                 self.moveableView.frame.origin.x         += pgr.translation(in: self).x
                 self.circularMoveableView.frame.origin.x += pgr.translation(in: self).x
                 if self.moveableView.frame.origin.x <= self.frame.origin.x {
