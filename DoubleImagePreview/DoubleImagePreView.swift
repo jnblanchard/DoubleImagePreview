@@ -33,50 +33,16 @@ class DoubleImagePreView: UIView {
 
 
     func orientationChanged() {
-        var imageOneWidth = (frame.size.width/2)-(separationSize/2)
-        if UIDevice.current.orientation.isPortrait {
-            guard parentViewOne.frame.size.height != frame.size.height else { return }
-            imageOneWidth = parentViewOne.frame.size.width * 0.562
-        } else {
-            guard parentViewOne.frame.size.height != frame.size.height else { return }
-            imageOneWidth = parentViewOne.frame.size.width * 1.778
-        }
-
-
-
-        parentViewOne.frame = CGRect(x: frame.origin.x,
-                                    y: frame.origin.y,
-                                    width: imageOneWidth,
-                                    height: frame.size.height)
-
-        parentViewTwo.frame = CGRect(x: imageOneWidth+separationSize,
-                                    y: frame.origin.y,
-                                    width: frame.size.width-(imageOneWidth+separationSize),
-                                    height: frame.size.height)
-
-        imageViewOne.frame = CGRect(x: frame.origin.x, y: frame.origin.y, width: frame.size.width, height: frame.size.height)
-        imageViewTwo.frame = CGRect(x: frame.origin.x, y: frame.origin.y, width: frame.size.width, height: frame.size.height)
-
-
-        moveableView.frame = CGRect(x: parentViewTwo.frame.origin.x-separationSize,
-                                    y: frame.origin.y,
-                                    width: separationSize,
-                                    height: frame.size.height)
-
-        circularMoveableView.frame = CGRect(x: (parentViewTwo.frame.origin.x-(separationSize/2))-(circularSize/2),
-                                            y: (frame.size.height/2)-(circularSize/2),
-                                            width: circularSize,
-                                            height: circularSize)
-        circularMoveableView.backgroundColor = UIColor.black
-
-        maskLayer.frame = parentViewOne.frame
+        maskLayer.contents = imageViewTwo.image
+        maskLayer.frame = CGRect(x: moveableView.frame.origin.x+moveableView.frame.size.width,
+                                 y: frame.origin.y,
+                                 width: frame.size.width - (moveableView.frame.origin.x+moveableView.frame.size.width),
+                                 height: frame.size.height)
 
     }
 
 
     override func draw(_ rect: CGRect) {
-        self.backgroundColor = UIColor.brown
-
         parentViewOne.frame = CGRect(x: rect.origin.x,
                                     y: rect.origin.y,
                                     width: (rect.size.width/2)-(separationSize/2),
@@ -100,6 +66,8 @@ class DoubleImagePreView: UIView {
         circularMoveableView.layer.cornerRadius = circularSize/2
         circularMoveableView.backgroundColor = UIColor.black
 
+
+        imageViewOne.translatesAutoresizingMaskIntoConstraints = false
         imageViewOne.frame = CGRect(x: rect.origin.x, y: rect.origin.y, width: rect.size.width, height: rect.size.height)
         imageViewOne.contentMode = .scaleAspectFill
 
@@ -113,14 +81,31 @@ class DoubleImagePreView: UIView {
         addSubview(moveableView)
         addSubview(circularMoveableView)
 
+        self.addConstraints(NSLayoutConstraint.constraints(
+            withVisualFormat: "H:|[v]|", options: .alignAllTop, metrics: nil, views: ["v": imageViewOne]))
+        self.addConstraints(NSLayoutConstraint.constraints(
+            withVisualFormat: "V:|[v]|", options: .alignAllLeft, metrics: nil, views: ["v": imageViewOne]))
+        self.addConstraints(NSLayoutConstraint.constraints(
+            withVisualFormat: "H:|[v]|", options: .alignAllTop, metrics: nil, views: ["v": imageViewOne]))
+        self.addConstraints(NSLayoutConstraint.constraints(
+            withVisualFormat: "V:|[v]|", options: .alignAllLeft, metrics: nil, views: ["v": imageViewOne]))
+        self.addConstraints(NSLayoutConstraint.constraints(
+            withVisualFormat: "H:|[v]|", options: .alignAllTop, metrics: nil, views: ["v": imageViewTwo]))
+        self.addConstraints(NSLayoutConstraint.constraints(
+            withVisualFormat: "V:|[v]|", options: .alignAllLeft, metrics: nil, views: ["v": imageViewTwo]))
+        self.addConstraints(NSLayoutConstraint.constraints(
+            withVisualFormat: "H:|[v]|", options: .alignAllTop, metrics: nil, views: ["v": imageViewTwo]))
+        self.addConstraints(NSLayoutConstraint.constraints(
+            withVisualFormat: "V:|[v]|", options: .alignAllLeft, metrics: nil, views: ["v": imageViewTwo]))
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(orientationChanged),
+                                               name: NSNotification.Name.UIDeviceOrientationDidChange,
+                                               object: nil)
+
         maskLayer.frame = parentViewOne.frame
         maskLayer.backgroundColor = UIColor.gray.cgColor
         imageViewOne.layer.mask = maskLayer
-
-        NotificationCenter.default.addObserver(self,
-                                                         selector: #selector(orientationChanged),
-                                                         name: NSNotification.Name.UIDeviceOrientationDidChange,
-                                                         object: nil)
 
 
         let pgr = UIPanGestureRecognizer(target: self, action: #selector(handlePan))
