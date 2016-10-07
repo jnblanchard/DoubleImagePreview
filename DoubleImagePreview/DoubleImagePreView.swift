@@ -62,7 +62,7 @@ class DoubleImagePreView: UIView {
         imageViewOne.frame = CGRect(x: rect.origin.x, y: rect.origin.y, width: rect.size.width, height: rect.size.height)
         imageViewOne.contentMode = .scaleAspectFill
 
-        imageViewOne.translatesAutoresizingMaskIntoConstraints = false
+        imageViewTwo.translatesAutoresizingMaskIntoConstraints = false
         imageViewTwo.frame = CGRect(x: rect.origin.x, y: rect.origin.y, width: rect.size.width, height: rect.size.height)
         imageViewTwo.contentMode = .scaleAspectFill
 
