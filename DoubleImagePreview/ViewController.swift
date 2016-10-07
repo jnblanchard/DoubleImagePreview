@@ -13,7 +13,7 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        doubleImagePreView.setBothImages(imageOne: UIImage(named: "unedited")!, imageTwo: UIImage(named: "edited")!)
+        doubleImagePreView.set(originalImage: UIImage(named: "unedited")!, retouchedImage: UIImage(named: "edited")!)
         // Do any additional setup after loading the view, typically from a nib.
     }
 
