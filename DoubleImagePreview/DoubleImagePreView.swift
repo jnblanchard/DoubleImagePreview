@@ -91,7 +91,7 @@ class DoubleImagePreView: UIView {
                                     y: rect.origin.y,
                                     width: separationSize,
                                     height: rect.size.height)
-        moveableView.backgroundColor = UIColor.black
+        moveableView.backgroundColor = UIColor.clear
 
         circularMoveableView.frame = CGRect(x: (rect.size.width/2)-(circularSize/2),
                                             y: (rect.size.height/2)-(circularSize/2),
