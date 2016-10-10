@@ -17,7 +17,7 @@ enum DoubleImageState {
 
 class DoubleImagePreView: UIView {
 
-    let separationSize: CGFloat = 1.0
+    let separationSize: CGFloat = 6.0
     let circularSize  : CGFloat = 60.0
 
     var imageViewOne = UIImageView()
@@ -27,16 +27,8 @@ class DoubleImagePreView: UIView {
     var maskLayer = CALayer()
     var leadingConstraint = NSLayoutConstraint()
 
-
-
-
     func orientationChanged() {
-        if UIDevice.current.orientation.isPortrait {
-
-        } else {
-
-        }
-
+        print("orientation changed")
     }
 
 
@@ -47,7 +39,7 @@ class DoubleImagePreView: UIView {
                                     y: rect.origin.y,
                                     width: separationSize,
                                     height: rect.size.height)
-        moveableView.backgroundColor = UIColor.clear
+        moveableView.backgroundColor = UIColor.black
 
         circularMoveableView.translatesAutoresizingMaskIntoConstraints = false
         circularMoveableView.frame = CGRect(x: (rect.size.width/2)-(circularSize/2),
@@ -80,8 +72,7 @@ class DoubleImagePreView: UIView {
         self.addConstraints(NSLayoutConstraint.constraints(
             withVisualFormat: "V:|[v(==x)]|", options: .alignAllLeft, metrics: nil, views: ["v": imageViewOne, "x": imageViewTwo]))
 
-
-        leadingConstraint = NSLayoutConstraint(item: moveableView, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: self.frame.midX)
+        leadingConstraint = NSLayoutConstraint(item: moveableView, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: frame.midX-(separationSize/2))
         self.addConstraint(leadingConstraint)
 
         let horizontalConstraint = circularMoveableView.centerXAnchor.constraint(equalTo: moveableView.centerXAnchor)
@@ -104,13 +95,13 @@ class DoubleImagePreView: UIView {
 
         let pgr = UIPanGestureRecognizer(target: self, action: #selector(handlePan))
         circularMoveableView.addGestureRecognizer(pgr)
+
     }
 
     func set(originalImage: UIImage, retouchedImage: UIImage) {
         imageViewTwo.image = retouchedImage
         maskLayer.contents = imageViewTwo.image
         imageViewOne.image = originalImage
-
     }
 
     func firstImageViewIsProminant() -> DoubleImageState {
@@ -126,7 +117,7 @@ class DoubleImagePreView: UIView {
     func setPhotoSizeForCurrentMoveableViewState() {
         CATransaction.begin()
         CATransaction.setValue(kCFBooleanTrue, forKey: kCATransactionDisableActions)
-        maskLayer.frame = CGRect(x: moveableView.frame.origin.x+separationSize, y: 0, width: frame.size.width-(moveableView.frame.origin.x+separationSize), height: frame.size.height)
+        maskLayer.frame = CGRect(x: moveableView.frame.origin.x+(separationSize/2), y: 0, width: frame.size.width-(moveableView.frame.origin.x+(separationSize/2)), height: frame.size.height)
         CATransaction.commit()
         switch firstImageViewIsProminant() {
         case .First:
@@ -147,16 +138,12 @@ class DoubleImagePreView: UIView {
         case .began:
             break
         default:
-            moveableView.frame.origin.x         += pgr.translation(in: self).x
-            circularMoveableView.frame.origin.x += pgr.translation(in: self).x
-            if moveableView.frame.origin.x <= frame.origin.x {
-                moveableView.frame.origin.x = frame.origin.x
-                circularMoveableView.frame.origin.x = frame.origin.x - (circularSize/2)
-            } else if moveableView.frame.origin.x + moveableView.frame.size.width >= frame.size.width {
-                moveableView.frame.origin.x = frame.size.width - moveableView.frame.size.width
-                circularMoveableView.frame.origin.x = frame.size.width - moveableView.frame.size.width - (circularSize/2)
+            leadingConstraint.constant    += pgr.translation(in: self).x
+            if leadingConstraint.constant <= frame.origin.x {
+                leadingConstraint.constant = frame.origin.x + moveableView.frame.size.width
+            } else if leadingConstraint.constant + (moveableView.frame.size.width) >= frame.size.width {
+                leadingConstraint.constant = frame.size.width - moveableView.frame.size.width
             }
-            leadingConstraint.constant = moveableView.frame.origin.x
             setPhotoSizeForCurrentMoveableViewState()
             pgr.setTranslation(CGPoint.zero, in: self)
         }
