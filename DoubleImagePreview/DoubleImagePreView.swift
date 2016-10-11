@@ -17,121 +17,104 @@ enum DoubleImageState {
 
 class DoubleImagePreView: UIView {
 
-    let separationSize: CGFloat = 1.0
+    let separationSize: CGFloat = 6.0
     let circularSize  : CGFloat = 60.0
 
     var imageViewOne = UIImageView()
     let imageViewTwo = UIImageView()
-    let parentViewOne = UIView()
-    var parentViewTwo = UIView()
     let moveableView         = UIView()
     let circularMoveableView = UIView()
     var maskLayer = CALayer()
+    var leadingConstraint = NSLayoutConstraint()
 
-
-    var amountFirstImageIsOffScreen: CGFloat = 0
-
+    var amountThroughFrame:CGFloat = 0.5
+    var lastWidth: CGFloat = 0
 
     func orientationChanged() {
-        var imageOneWidth = (frame.size.width/2)-(separationSize/2)
-        if UIDevice.current.orientation.isPortrait {
-            guard parentViewOne.frame.size.height != frame.size.height else { return }
-            imageOneWidth = parentViewOne.frame.size.width * 0.562
-        } else {
-            guard parentViewOne.frame.size.height != frame.size.height else { return }
-            imageOneWidth = parentViewOne.frame.size.width * 1.778
+        guard lastWidth != frame.size.height else {
+            return
         }
-
-
-
-        parentViewOne.frame = CGRect(x: frame.origin.x,
-                                    y: frame.origin.y,
-                                    width: imageOneWidth,
-                                    height: frame.size.height)
-
-        parentViewTwo.frame = CGRect(x: imageOneWidth+separationSize,
-                                    y: frame.origin.y,
-                                    width: frame.size.width-(imageOneWidth+separationSize),
-                                    height: frame.size.height)
-
-        imageViewOne.frame = CGRect(x: frame.origin.x, y: frame.origin.y, width: frame.size.width, height: frame.size.height)
-        imageViewTwo.frame = CGRect(x: frame.origin.x, y: frame.origin.y, width: frame.size.width, height: frame.size.height)
-
-
-        moveableView.frame = CGRect(x: parentViewTwo.frame.origin.x-separationSize,
-                                    y: frame.origin.y,
-                                    width: separationSize,
-                                    height: frame.size.height)
-
-        circularMoveableView.frame = CGRect(x: (parentViewTwo.frame.origin.x-(separationSize/2))-(circularSize/2),
-                                            y: (frame.size.height/2)-(circularSize/2),
-                                            width: circularSize,
-                                            height: circularSize)
-        circularMoveableView.backgroundColor = UIColor.black
-
-        maskLayer.frame = parentViewOne.frame
-
+        lastWidth = frame.size.height
+        leadingConstraint.constant = lastWidth * amountThroughFrame
+        layoutIfNeeded()
     }
 
 
     override func draw(_ rect: CGRect) {
-        self.backgroundColor = UIColor.brown
 
-        parentViewOne.frame = CGRect(x: rect.origin.x,
-                                    y: rect.origin.y,
-                                    width: (rect.size.width/2)-(separationSize/2),
-                                    height: rect.size.height)
-
-        parentViewTwo.frame = CGRect(x: (rect.size.width/2)+(separationSize/2),
-                                    y: rect.origin.y,
-                                    width: (rect.size.width/2)-(separationSize/2),
-                                    height: rect.size.height)
-
+        moveableView.translatesAutoresizingMaskIntoConstraints = false
         moveableView.frame = CGRect(x: (rect.size.width/2)-(separationSize/2),
                                     y: rect.origin.y,
                                     width: separationSize,
                                     height: rect.size.height)
         moveableView.backgroundColor = UIColor.clear
 
+        circularMoveableView.translatesAutoresizingMaskIntoConstraints = false
         circularMoveableView.frame = CGRect(x: (rect.size.width/2)-(circularSize/2),
                                             y: (rect.size.height/2)-(circularSize/2),
                                             width: circularSize,
                                             height: circularSize)
         circularMoveableView.layer.cornerRadius = circularSize/2
-        circularMoveableView.backgroundColor = UIColor.black
+        circularMoveableView.backgroundColor = UIColor(colorLiteralRed: 0, green: 0, blue: 0, alpha: 0.6)
 
+
+        imageViewOne.translatesAutoresizingMaskIntoConstraints = false
         imageViewOne.frame = CGRect(x: rect.origin.x, y: rect.origin.y, width: rect.size.width, height: rect.size.height)
         imageViewOne.contentMode = .scaleAspectFill
 
+        imageViewTwo.translatesAutoresizingMaskIntoConstraints = false
         imageViewTwo.frame = CGRect(x: rect.origin.x, y: rect.origin.y, width: rect.size.width, height: rect.size.height)
         imageViewTwo.contentMode = .scaleAspectFill
 
-        addSubview(parentViewOne)
-        addSubview(parentViewTwo)
         addSubview(imageViewTwo)
         addSubview(imageViewOne)
         addSubview(moveableView)
         addSubview(circularMoveableView)
 
-        maskLayer.frame = parentViewOne.frame
+        self.addConstraints(NSLayoutConstraint.constraints(
+            withVisualFormat: "H:|[v(==x)]|", options: .alignAllTop, metrics: nil, views: ["v": imageViewOne, "x": imageViewTwo]))
+        self.addConstraints(NSLayoutConstraint.constraints(
+            withVisualFormat: "V:|[v(==x)]|", options: .alignAllLeft, metrics: nil, views: ["v": imageViewOne, "x": imageViewTwo]))
+        self.addConstraints(NSLayoutConstraint.constraints(
+            withVisualFormat: "H:|[v(==x)]|", options: .alignAllTop, metrics: nil, views: ["v": imageViewOne, "x": imageViewTwo]))
+        self.addConstraints(NSLayoutConstraint.constraints(
+            withVisualFormat: "V:|[v(==x)]|", options: .alignAllLeft, metrics: nil, views: ["v": imageViewOne, "x": imageViewTwo]))
+
+        let topLineConstraint = NSLayoutConstraint(item: moveableView, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0)
+        let widthLineConstraint = NSLayoutConstraint(item: moveableView, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: separationSize)
+        let heightLineConstraint = NSLayoutConstraint(item: moveableView, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 1, constant: 0)
+        leadingConstraint = NSLayoutConstraint(item: moveableView, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: frame.midX-(separationSize/2))
+        addConstraints([topLineConstraint, widthLineConstraint, heightLineConstraint, leadingConstraint])
+        lastWidth = frame.size.width
+
+        let horizontalConstraint = circularMoveableView.centerXAnchor.constraint(equalTo: moveableView.centerXAnchor)
+        let verticalConstraint = circularMoveableView.centerYAnchor.constraint(equalTo: self.centerYAnchor)
+        let widthConstraint = circularMoveableView.widthAnchor.constraint(equalToConstant: circularSize)
+        let heightConstraint = circularMoveableView.heightAnchor.constraint(equalToConstant: circularSize)
+        NSLayoutConstraint.activate([horizontalConstraint,verticalConstraint,widthConstraint,heightConstraint])
+
+        maskLayer.frame = CGRect(x: moveableView.frame.origin.x+moveableView.frame.size.width,
+                                 y: frame.origin.y,
+                                 width: frame.size.width - (moveableView.frame.origin.x+moveableView.frame.size.width),
+                                 height: frame.size.height)
         maskLayer.backgroundColor = UIColor.gray.cgColor
         imageViewOne.layer.mask = maskLayer
 
         NotificationCenter.default.addObserver(self,
-                                                         selector: #selector(orientationChanged),
-                                                         name: NSNotification.Name.UIDeviceOrientationDidChange,
-                                                         object: nil)
-
+                                               selector: #selector(orientationChanged),
+                                               name: NSNotification.Name.UIDeviceOrientationDidChange,
+                                               object: nil)
 
         let pgr = UIPanGestureRecognizer(target: self, action: #selector(handlePan))
-        circularMoveableView.addGestureRecognizer(pgr)
+        addGestureRecognizer(pgr)
+
+
     }
 
-    func setBothImages(imageOne: UIImage, imageTwo: UIImage) {
-        imageViewTwo.image = imageTwo
+    func set(originalImage: UIImage, retouchedImage: UIImage) {
+        imageViewTwo.image = retouchedImage
         maskLayer.contents = imageViewTwo.image
-        imageViewOne.image = imageOne
-
+        imageViewOne.image = originalImage
     }
 
     func firstImageViewIsProminant() -> DoubleImageState {
@@ -145,11 +128,9 @@ class DoubleImagePreView: UIView {
     }
 
     func setPhotoSizeForCurrentMoveableViewState() {
-        parentViewOne.frame = CGRect(x: 0, y: 0, width: moveableView.frame.origin.x, height: parentViewOne.frame.size.height)
-        parentViewTwo.frame = CGRect(x: moveableView.frame.origin.x+separationSize, y: 0, width: self.frame.size.width-(moveableView.frame.origin.x+separationSize) , height: parentViewTwo.frame.size.height)
         CATransaction.begin()
         CATransaction.setValue(kCFBooleanTrue, forKey: kCATransactionDisableActions)
-        maskLayer.frame = CGRect(x: 0, y: 0, width: moveableView.frame.origin.x, height: frame.size.height)
+        maskLayer.frame = CGRect(x: moveableView.frame.origin.x+(separationSize/2), y: 0, width: frame.size.width-(moveableView.frame.origin.x+(separationSize/2)), height: frame.size.height)
         CATransaction.commit()
         switch firstImageViewIsProminant() {
         case .First:
@@ -170,15 +151,13 @@ class DoubleImagePreView: UIView {
         case .began:
             break
         default:
-            moveableView.frame.origin.x         += pgr.translation(in: self).x
-            circularMoveableView.frame.origin.x += pgr.translation(in: self).x
-            if moveableView.frame.origin.x <= frame.origin.x {
-                moveableView.frame.origin.x = frame.origin.x
-                circularMoveableView.frame.origin.x = frame.origin.x - (circularSize/2)
-            } else if moveableView.frame.origin.x + moveableView.frame.size.width >= frame.size.width {
-                moveableView.frame.origin.x = frame.size.width - moveableView.frame.size.width
-                circularMoveableView.frame.origin.x = frame.size.width - moveableView.frame.size.width - (circularSize/2)
+            leadingConstraint.constant    += pgr.translation(in: self).x
+            if leadingConstraint.constant <= frame.origin.x {
+                leadingConstraint.constant = -moveableView.frame.size.width
+            } else if leadingConstraint.constant + (moveableView.frame.size.width) >= frame.size.width {
+                leadingConstraint.constant = frame.size.width
             }
+            amountThroughFrame = leadingConstraint.constant/frame.size.width
             setPhotoSizeForCurrentMoveableViewState()
             pgr.setTranslation(CGPoint.zero, in: self)
         }
