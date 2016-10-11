@@ -84,7 +84,9 @@
 				AC7962001DA4825B0083F9CD /* DoubleImagePreviewUITests */,
 				AC7961DF1DA4825B0083F9CD /* Products */,
 			);
+			indentWidth = 2;
 			sourceTree = "<group>";
+			tabWidth = 2;
 		};
 		AC7961DF1DA4825B0083F9CD /* Products */ = {
 			isa = PBXGroup;
@@ -518,6 +520,7 @@
 				AC7962081DA4825B0083F9CD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		AC7962091DA4825B0083F9CD /* Build configuration list for PBXNativeTarget "DoubleImagePreviewTests" */ = {
 			isa = XCConfigurationList;
@@ -526,6 +529,7 @@
 				AC79620B1DA4825B0083F9CD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		AC79620C1DA4825B0083F9CD /* Build configuration list for PBXNativeTarget "DoubleImagePreviewUITests" */ = {
 			isa = XCConfigurationList;
@@ -534,6 +538,7 @@
 				AC79620E1DA4825B0083F9CD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
