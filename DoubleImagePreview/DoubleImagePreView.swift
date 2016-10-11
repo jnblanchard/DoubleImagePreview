@@ -27,8 +27,16 @@ class DoubleImagePreView: UIView {
     var maskLayer = CALayer()
     var leadingConstraint = NSLayoutConstraint()
 
+    var amountThroughFrame:CGFloat = 0.5
+    var lastWidth: CGFloat = 0
+
     func orientationChanged() {
-        print("orientation changed")
+        guard lastWidth != frame.size.height else {
+            return
+        }
+        lastWidth = frame.size.height
+        leadingConstraint.constant = lastWidth * amountThroughFrame
+        layoutIfNeeded()
     }
 
 
@@ -39,7 +47,7 @@ class DoubleImagePreView: UIView {
                                     y: rect.origin.y,
                                     width: separationSize,
                                     height: rect.size.height)
-        moveableView.backgroundColor = UIColor.black
+        moveableView.backgroundColor = UIColor.clear
 
         circularMoveableView.translatesAutoresizingMaskIntoConstraints = false
         circularMoveableView.frame = CGRect(x: (rect.size.width/2)-(circularSize/2),
@@ -47,7 +55,7 @@ class DoubleImagePreView: UIView {
                                             width: circularSize,
                                             height: circularSize)
         circularMoveableView.layer.cornerRadius = circularSize/2
-        circularMoveableView.backgroundColor = UIColor.black
+        circularMoveableView.backgroundColor = UIColor(colorLiteralRed: 0, green: 0, blue: 0, alpha: 0.6)
 
 
         imageViewOne.translatesAutoresizingMaskIntoConstraints = false
@@ -72,8 +80,12 @@ class DoubleImagePreView: UIView {
         self.addConstraints(NSLayoutConstraint.constraints(
             withVisualFormat: "V:|[v(==x)]|", options: .alignAllLeft, metrics: nil, views: ["v": imageViewOne, "x": imageViewTwo]))
 
+        let topLineConstraint = NSLayoutConstraint(item: moveableView, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0)
+        let widthLineConstraint = NSLayoutConstraint(item: moveableView, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: separationSize)
+        let heightLineConstraint = NSLayoutConstraint(item: moveableView, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 1, constant: 0)
         leadingConstraint = NSLayoutConstraint(item: moveableView, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: frame.midX-(separationSize/2))
-        self.addConstraint(leadingConstraint)
+        addConstraints([topLineConstraint, widthLineConstraint, heightLineConstraint, leadingConstraint])
+        lastWidth = frame.size.width
 
         let horizontalConstraint = circularMoveableView.centerXAnchor.constraint(equalTo: moveableView.centerXAnchor)
         let verticalConstraint = circularMoveableView.centerYAnchor.constraint(equalTo: self.centerYAnchor)
@@ -94,7 +106,8 @@ class DoubleImagePreView: UIView {
                                                object: nil)
 
         let pgr = UIPanGestureRecognizer(target: self, action: #selector(handlePan))
-        circularMoveableView.addGestureRecognizer(pgr)
+        addGestureRecognizer(pgr)
+
 
     }
 
@@ -140,10 +153,11 @@ class DoubleImagePreView: UIView {
         default:
             leadingConstraint.constant    += pgr.translation(in: self).x
             if leadingConstraint.constant <= frame.origin.x {
-                leadingConstraint.constant = frame.origin.x + moveableView.frame.size.width
+                leadingConstraint.constant = -moveableView.frame.size.width
             } else if leadingConstraint.constant + (moveableView.frame.size.width) >= frame.size.width {
-                leadingConstraint.constant = frame.size.width - moveableView.frame.size.width
+                leadingConstraint.constant = frame.size.width
             }
+            amountThroughFrame = leadingConstraint.constant/frame.size.width
             setPhotoSizeForCurrentMoveableViewState()
             pgr.setTranslation(CGPoint.zero, in: self)
         }
